@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:3000", // React uygulamanın çalıştığı port
+        origin: "http://localhost:3000",
         methods: ["GET", "POST"]
     }
 });
@@ -25,7 +25,13 @@ db.connect()
     .then(() => console.log('PostgreSQL bağlantısı başarılı'))
     .catch((err) => console.error('PostgreSQL bağlantı hatası:', err.stack));
 
+// Takma adları sakla
 const nicknames = new Set();
+
+// Kullanıcı listesini gönderme fonksiyonu
+const emitUserList = () => {
+    io.emit('user-list', Array.from(nicknames));
+};
 
 io.on('connection', (socket) => {
     console.log('Yeni bağlantı:', socket.id);
@@ -39,8 +45,10 @@ io.on('connection', (socket) => {
         socket.nickname = nickname;
         nicknames.add(nickname);
         console.log(`${nickname} sohbete katıldı.`);
-
-        io.emit('user-joined', nickname);
+        socket.emit('user-list', Array.from(nicknames)); // sadece bağlanan kişiye
+        io.emit('user-joined', nickname); // herkese katıldı mesajı
+        io.emit('user-list', Array.from(nicknames)); // herkese güncel liste
+        emitUserList(); // Tüm istemcilere listeyi gönder
     });
 
     socket.on('message', (msg) => {
@@ -71,8 +79,10 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (socket.nickname) {
             nicknames.delete(socket.nickname);
-            io.emit('user-left', socket.nickname);
             console.log(`${socket.nickname} ayrıldı.`);
+
+            io.emit('user-left', socket.nickname);
+            emitUserList(); // Güncel kullanıcı listesini gönder
         }
     });
 });
