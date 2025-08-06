@@ -10,7 +10,27 @@ function App() {
   const [messages, setMessages] = useState([]);
   const [userList, setUserList] = useState([]);
   const messagesEndRef = useRef(null);
+  const initialMessagesLoaded = useRef(false);
 
+  // Kullanıcı katıldıktan sonra mesajları çek
+  useEffect(() => {
+    console.log("Geçmiş mesajlar çekiliyor...");
+    fetch("http://localhost:8000/api/messages")
+        .then((res) => res.json())
+        .then((data) => {
+          const formatted = data.reverse().map((msg) => ({
+            nickname: msg.nickname,
+            message: msg.message,
+          }));
+          setMessages(formatted);
+          initialMessagesLoaded.current = true;
+        })
+        .catch((err) => console.error("Mesajlar alınamadı:", err));
+  }, []);
+
+
+
+  // WebSocket olayları
   useEffect(() => {
     socket.on('join-error', (msg) => {
       alert(msg);
@@ -19,17 +39,11 @@ function App() {
     });
 
     socket.on('user-joined', (nick) => {
-      console.log("Bir kullanıcı katıldı:", nick);
       setMessages((prev) => [...prev, { nickname: 'SYSTEM', message: `${nick} katıldı` }]);
-
-      // Eğer katılan kullanıcı bizsek, sohbet ekranına geç
-      if (nick === nickname) {
-        setJoined(true);
-      }
+      if (nick === nickname) setJoined(true);
     });
 
     socket.on('user-left', (nick) => {
-      console.log("Bir kullanıcı ayrıldı:", nick);
       setMessages((prev) => [...prev, { nickname: 'SYSTEM', message: `${nick} ayrıldı` }]);
     });
 
@@ -38,7 +52,6 @@ function App() {
     });
 
     socket.on('user-list', (users) => {
-      console.log("Kullanıcı listesi güncellendi:", users);
       setUserList(users);
     });
 
@@ -51,6 +64,7 @@ function App() {
     };
   }, [nickname]);
 
+  // Scroll'u sona al
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
