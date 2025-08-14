@@ -102,9 +102,3 @@ Kullanıcı bir takma ad girerek sohbete katılır. Gönderilen mesajlar hem di�
 API Uç Noktaları
 
 GET /api/messages → Son 50 mesajı döndürür (JSON formatında)
-
-Proje Yapısı
-chat-app/
-├── laravel-backend/      # Laravel API
-├── websocket-server/     # Node.js WebSocket sunucusu
-├── frontend/             # React arayüz
