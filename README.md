@@ -1,105 +1,129 @@
-Bu proje, Laravel tabanlı bir backend API, Node.js WebSocket sunucusu ve React tabanlı bir frontend ile gerçek zamanlı sohbet uygulamasıdır. Mesajlar PostgreSQL veritabanında saklanır.
+Bu proje; Laravel API, React frontend ve Node.js WebSocket server kullanılarak gerçek zamanlı bir sohbet uygulaması olarak geliştirilmiştir. Mesajlar PostgreSQL veritabanında saklanır ve sayfa yenilense bile kaybolmaz.
 
-Gereksinimler
+1. Gereksinimler
 
 PHP 8.2+
 
-Composer
+Composer (Laravel için)
 
-Node.js 18+
-
-npm veya yarn
+Node.js 18+ ve npm
 
 PostgreSQL 14+
 
 Git
 
-Kurulum Adımları
-1. Depoyu Klonla
+2. Kurulum
+2.1. Repoyu klonla
 git clone <repo-url>
 cd chat-app
 
-2. Laravel Backend Kurulumu
+2.2. Laravel backend kurulum
 cd laravel-backend
 composer install
-
-
-.env dosyasını oluştur ve veritabanı ayarlarını yap:
-
 cp .env.example .env
+php artisan key:generate
 
 
-.env içinde aşağıdaki alanları güncelle:
+.env dosyasını aç ve veritabanı ayarlarını düzenle:
 
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
 DB_DATABASE=chatapp
 DB_USERNAME=postgres
-DB_PASSWORD=parolan
+DB_PASSWORD=parola
+
+3. Veritabanı
+3.1. Veritabanını oluştur
+
+PostgreSQL terminalinde:
+
+CREATE DATABASE chatapp;
+
+3.2. Migration ile tablo oluştur
+php artisan make:migration create_chat_messages_table --create=chat_messages
 
 
-Veritabanını oluştur ve migration çalıştır:
+Migration dosyasına şu yapıyı ekle:
+
+public function up(): void
+{
+    Schema::create('chat_messages', function (Blueprint $table) {
+        $table->id();
+        $table->string('nickname');
+        $table->text('message');
+        $table->timestamp('sent_at');
+        $table->timestamps();
+    });
+}
+
+
+Ardından migration çalıştır:
 
 php artisan migrate
 
-
-Laravel server'ı başlat:
-
-php artisan serve --port=8000
-
-
-Artık API http://localhost:8000 üzerinden çalışacaktır.
-
-3. WebSocket Sunucusu Kurulumu
+4. WebSocket Server Kurulumu
+4.1. Node.js paketlerini yükle
 cd ../websocket-server
 npm install
 
-
-index.js içinde PostgreSQL bağlantı bilgilerini düzenle:
-
-const db = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'chatapp',
-    password: 'parolan',
-    port: 5432,
-});
-
-
-WebSocket sunucusunu başlat:
-
+4.2. WebSocket server başlat
 node index.js
 
 
-Artık WebSocket sunucusu http://localhost:3001 üzerinde çalışacaktır.
+Bu sunucu localhost:3001 portunda çalışır.
 
-4. React Frontend Kurulumu
+5. React Frontend
+5.1. Geliştirme modunda çalıştırma
 cd ../frontend
 npm install
-
-
-Geliştirme modunda çalıştırmak için:
-
 npm start
 
 
-Production için build almak ve Laravel public dizinine kopyalamak:
+Bu modda frontend localhost:3000 üzerinden çalışır.
+
+5.2. Laravel ile entegre çalıştırma
+
+React uygulamasını build et:
 
 npm run build
+
+
+Build çıktısını Laravel public klasörüne kopyala:
+
 cp -r build/* ../laravel-backend/public/
 
-Kullanım
 
-Backend (Laravel): php artisan serve --port=8000
+Artık Laravel çalıştığında frontend de localhost:8000 üzerinden açılır.
 
-WebSocket Server (Node.js): node index.js
+6. Laravel Çalıştırma
+cd ../laravel-backend
+php artisan serve
 
-Frontend: Tarayıcıdan http://localhost:8000 adresine git
 
-Kullanıcı bir takma ad girerek sohbete katılır. Gönderilen mesajlar hem diğer kullanıcılara iletilir hem de PostgreSQL veritabanında saklanır. Sayfa yenilendiğinde geçmiş mesajlar otomatik olarak API üzerinden çekilir.
+Laravel API localhost:8000 adresinde çalışır.
 
-API Uç Noktaları
+7. Kullanım
 
-GET /api/messages → Son 50 mesajı döndürür (JSON formatında)
+WebSocket server (node index.js) çalışır durumda olmalı.
 
+Laravel API (php artisan serve) çalışır durumda olmalı.
+
+React frontend geliştirme modunda (npm start) veya build edilip Laravel public klasöründe bulunmalı.
+
+Tarayıcıdan uygulamayı aç, takma ad girerek sohbete katıl.
+
+8. API Endpoint’leri
+Method	URL	Açıklama
+GET	/api/messages	Son 50 mesajı döndürür
+9. Notlar
+
+CORS ayarları laravel-backend/config/cors.php içinde düzenlenebilir.
+
+Route tanımları laravel-backend/routes/web.php ve laravel-backend/routes/api.php içinde yer alır.
+
+Laravel’de SPA yönlendirmesi şu yapı ile sağlanır:
+
+Route::get('/{any}', function () {
+    return file_get_contents(public_path('index.html'));
+})->where('any', '.*');
