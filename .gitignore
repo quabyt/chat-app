@@ -1,21 +1,51 @@
+# Genel .env dosyaları (tüm alt klasörlerde)
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
 # Node.js
-node_modules/
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+**/node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+# package-lock.json'ı commit etmek istiyorsanız bu satırı kaldırın
 
-# VSCode
+# React build / dist (frontend tarafı)
+frontend/build/
+frontend/dist/
+
+# Laravel vendor ve cache
+laravel-backend/vendor/
+laravel-backend/bootstrap/cache/*.php   # framework önbellek çıktıları
+
+# Laravel storage içerikleri (public link hariç)
+laravel-backend/storage/*.key
+laravel-backend/storage/app/public/*
+laravel-backend/storage/framework/cache/*
+laravel-backend/storage/framework/sessions/*
+laravel-backend/storage/framework/testing/*
+laravel-backend/storage/framework/views/*
+laravel-backend/storage/logs/*
+
+# Laravel public içine kopyalanan React build çıktıları
+laravel-backend/public/asset-manifest.json
+laravel-backend/public/manifest.json
+laravel-backend/public/index.html
+laravel-backend/public/static/
+laravel-backend/public/*.map
+laravel-backend/public/*.ico
+laravel-backend/public/logo*.png
+
+# Laravel Vite / Mix hot & build (kullanıyorsanız)
+laravel-backend/public/hot
+laravel-backend/public/build/
+
+# Editör ve OS dosyaları
 .vscode/
-
-# OS
+.idea/
 .DS_Store
 Thumbs.db
-
-# React build klasörü
-build/
-dist/
