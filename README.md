@@ -1,83 +1,65 @@
-<<<<<<< HEAD
-Bu proje, Laravel backend, React frontend ve Socket.IO tabanlı WebSocket sunucusundan oluşan gerçek zamanlı bir sohbet uygulamasıdır.
-Repo, gerekli migrations dosyaları ve Laravel public klasörüne kopyalanmış React build çıktılarıyla birlikte gelir.
-Bu yüzden sıfırdan build veya migration işlemleri için ek ayarlar yapmaya gerek yoktur, yalnızca temel kurulum adımlarını takip etmeniz yeterlidir.
-=======
 Chat App — Laravel + React + WebSocket + PostgreSQL
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
 
-Bu proje üç parçadan oluşur:
+Gerçek zamanlı sohbet uygulaması:
 
-<<<<<<< HEAD
-PHP 8.1+
+laravel-backend: HTTP API ve üretimde SPA dosyalarını servis eder.
 
-Composer
-=======
-laravel-backend: HTTP API ve statik dosya servis eden Laravel uygulaması
+websocket-server: Socket.IO tabanlı sohbet sunucusu.
 
-websocket-server: Socket.IO tabanlı sohbet (echo) sunucusu
+frontend: React arayüzü (build alınıp Laravel tarafından servis edilir).
 
-frontend: React arayüzü (geliştirme sırasında 3000 portu; üretimde build alınıp Laravel tarafından servis edilir)
-
-Tüm sohbet mesajları PostgreSQL veritabanında saklanır. Tek sohbet odası vardır; takma ad (nickname) ile giriş yapılır, takma ad çakışması engellenir, herkes tüm mesajları görür.
+Mesajlar PostgreSQL’de saklanır; tek oda, takma ad kontrolü, tüm kullanıcılara yayın.
 
 Gereksinimler
 
 PHP 8.1+ ve Composer
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
 
-Node.js & npm
+PHP’de pdo_pgsql ve pgsql eklentileri açık olmalı (Windows: php.ini içinde extension=pdo_pgsql ve extension=pgsql)
 
-<<<<<<< HEAD
-PostgreSQL
+Node.js 18+ ve npm
 
-Git
-
-Kurulum Adımları
-
-Backend bağımlılıklarını yükle:
-
-=======
 PostgreSQL 13+
 
 Git
 
-Windows için: PHP’de pdo_pgsql ve pgsql eklentileri açık olmalıdır (php.ini içinde extension=pdo_pgsql ve extension=pgsql)
-
 Dizin Yapısı
-chat-app/
-├─ laravel-backend/      # Laravel API ve üretimde servis edilecek statik dosyalar (public/)
-├─ websocket-server/     # Node.js + Socket.IO
-└─ frontend/             # React kaynak kodu (geliştirme/build)
 
-Hızlı Kurulum
+chat-app/
+
+├─ laravel-backend/      # Laravel API ve (build sonrası) statik SPA
+
+├─ websocket-server/     # Socket.IO sunucusu
+
+└─ frontend/             # React kaynak kodu
+
+Kurulum Adımları
+
 1) Depoyu klonla
+
 git clone <REPO_URL>
+
 cd chat-app
 
 2) PostgreSQL veritabanını oluştur
+
+psql veya GUI ile:
+
 CREATE DATABASE chatapp;
 
 3) Laravel backend’i hazırla
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
+
 cd laravel-backend
 
 composer install
 
-.env dosyasını oluştur:
-
 cp .env.example .env
 
-<<<<<<< HEAD
-.env içinde veritabanı ayarlarını yap:
-=======
 
-.env içinde veritabanı bilgilerini düzenle:
+.env dosyasını düzenle:
 
 APP_ENV=local
-APP_KEY=        # Boş bırak, bir sonraki adımda üretilecek
+
 APP_URL=http://localhost:8000
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
 
 DB_CONNECTION=pgsql
 
@@ -88,46 +70,13 @@ DB_PORT=5432
 DB_DATABASE=chatapp
 
 DB_USERNAME=postgres
-<<<<<<< HEAD
 
-DB_PASSWORD=parolan
-
-PostgreSQL üzerinde chatapp isimli boş veritabanını oluştur.
-
-Migration çalıştır:
-
-php artisan migrate
-
-(Migration dosyaları ve React build zaten repo’da mevcut olduğu için ek işlem gerekmez.)
-
-Laravel’i çalıştır:
-
-php artisan serve //Laravel API ve frontend artık http://localhost:8000 adresinde çalışır.
------------------------------
-WebSocket Sunucusunu Çalıştırma
-
-WebSocket klasörüne gir:
-
-cd websocket-server
-
-Node bağımlılıklarını yükle:
-
-npm install
-
-WebSocket sunucusunu başlat:
-=======
 DB_PASSWORD=parolan
 
 
 Uygulama anahtarını üret:
 
 php artisan key:generate
-
-
-Konfigürasyon önbelleğini temizlemek gerekirse:
-
-php artisan config:clear
-php artisan cache:clear
 
 
 Migration’ları çalıştır:
@@ -137,68 +86,34 @@ php artisan migrate
 
 Laravel’i başlat:
 
-php artisan serve  # http://localhost:8000
+php artisan serve   # http://localhost:8000
 
-4) WebSocket sunucusunu hazırla
 
-Ayrı bir terminalde:
+Not: “Please provide a valid cache path.” hatasında storage/framework/views klasörünü oluşturup php artisan view:clear çalıştırın.
+
+4) WebSocket sunucusunu başlat
+
+Yeni bir terminalde:
 
 cd websocket-server
+
 npm install
-node index.js      # http://localhost:3001
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
 
-node index.js // Sunucu varsayılan olarak http://localhost:3001 adresinde çalışır.
+node index.js       # http://localhost:3001
 
-<<<<<<< HEAD
------------------------------
-Tarayıcıdan http://localhost:8000 adresine giderek uygulamayı kullanmaya başlayabilirsin.
 
-Laravel API ve WebSocket server çalışıyor olmalıdır.
+Not: websocket-server/index.js içindeki CORS origin listesinde http://localhost:8000 bulunduğundan emin olun (frontend’i Laravel servis edeceği için).
 
------------------------------
-Notlar
-React build dosyaları (laravel-backend/public/ altında) ve migrations zaten repo’da mevcut olduğu için npm run build veya migration dosyalarıyla manuel uğraşmaya gerek yoktur.
+5) React frontend’i derle ve Laravel public’e kopyala
 
-Eğer frontend kodlarında değişiklik yapılırsa:
+Yeni bir terminalde:
 
 cd frontend
 
 npm install
-=======
-Not: websocket-server/index.js içindeki PostgreSQL bağlantı bilgileri .env yerine dosyada tanımlıysa kendi sisteminize göre güncelleyin.
 
-5) React frontend (geliştirme sırasında)
-
-Ayrı bir terminalde:
-
-cd frontend
-npm install
-npm start          # http://localhost:3000
-
-
-Geliştirme akışı:
-
-React’i npm start ile çalıştırabilir, API isteklerini http://localhost:8000’a, Socket.IO’yu http://localhost:3001’e yönlendirebilirsiniz.
-
-CORS hatalarında Laravel config/cors.php → allowed_origins ve WebSocket io({ cors: { origin: ... }}) ayarlarını http://localhost:3000 ve http://localhost:8000 için güncelleyin.
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
-
-6) React frontend (üretimde Laravel’den servis)
-
-Güncel arayüzü Laravel’in public/ klasöründen servis etmek için:
-
-cd frontend
 npm run build
 
-<<<<<<< HEAD
-cp -r build/* ../laravel-backend/public/
-
-
-
-
-
-=======
 
 Build çıktısını Laravel public/ içine kopyala:
 
@@ -212,23 +127,40 @@ Windows PowerShell:
 Copy-Item -Recurse -Force build\* ..\laravel-backend\public\
 
 
-Artık tarayıcıdan sadece http://localhost:8000 adresine giderek uygulamayı kullanabilirsiniz.
+Artık tarayıcıdan şu adrese giderek uygulamayı kullanabilirsin:
+
+http://localhost:8000
 
 Sık Karşılaşılan Sorunlar
 
-MissingAppKeyException / APP_KEY yok
+APP_KEY hatası
+
 cd laravel-backend && php artisan key:generate
 
 PDO/driver bulunamadı (pgsql)
-PHP php.ini içinde extension=pdo_pgsql ve extension=pgsql satırlarını etkinleştirin; servisleri/terminali yeniden başlatın.
+
+php.ini içinde extension=pdo_pgsql ve extension=pgsql etkinleştirin; terminali/servisi yeniden başlatın.
 
 “no password supplied”
-.env içindeki DB_PASSWORD dolu olsun. Değişiklikten sonra php artisan config:clear çalıştırın.
 
-Duplicate table / birden fazla migration aynı tabloyu yaratıyor
-Çakışan migration dosyalarını temizleyin veya veriyi saklamanız gerekmiyorsa php artisan migrate:fresh ile sıfırdan kurun.
+.env içinde DB_PASSWORD dolu olmalı. Değişiklikten sonra:
+
+php artisan config:clear
+
+
+Duplicate table
+
+Çakışan migration varsa ve veriyi saklamanız gerekmiyorsa:
+
+php artisan migrate:fresh
+
 
 CORS
-Laravel config/cors.php → paths içine api/* ekli olmalı, allowed_origins listesinde http://localhost:3000 ve http://localhost:8000 yer almalı.
-WebSocket Server örneğinde cors.origin olarak aynı adresleri tanımlayın.
->>>>>>> 8b35eeb (docs: kurulum README eklendi, .gitignore güncellendi)
+
+Frontend Laravel’den servis edildiği için WebSocket CORS origin’inde http://localhost:8000 olmalı.
+
+Laravel tarafında config/cors.php → paths içinde api/* bulunduğundan emin olun.
+
+Notlar
+
+Frontend üzerinde değişiklik yaptığında yeniden npm run build al ve çıktıyı Laravel public/ içine tekrar kopyala.
